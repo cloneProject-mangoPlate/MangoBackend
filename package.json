@@ -22,5 +22,6 @@
     "nodemon": "^2.0.12",
     "npm": "^7.19.1",
     "passport-kakao": "^1.0.1"
-  }
+  },
+  "type": "module"
 }
