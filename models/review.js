@@ -1,7 +1,15 @@
 import mongoose from 'mongoose'
 
 export const reviewSchema = new mongoose.Schema({
-    userId: {
+    shop_name: {
+        type: String,
+        required: true,
+    },
+    nickname: {
+        type: String,
+        required: true,
+    },
+    profilePic: {
         type: String,
         required: true,
     },
@@ -13,7 +21,8 @@ export const reviewSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-});
+    
+}, {timestamps: true});
 
 reviewSchema.virtual('reviewId').get(function () {
     return this._id.toHexString();
