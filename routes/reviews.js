@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/:shopId', async(req, res) => {
     const { shopId } = req.params;
     const { nickname, profilePic, text, rate } = req.body;
+    const { userId } = res.locals
        
     if (text === '') {
         res.status(400).send({
@@ -16,10 +17,11 @@ router.post('/:shopId', async(req, res) => {
       }
 
     try{
-    const review = await Review.create( shopId, nickname, profilePic, text, rate )
+    const review = new Review({ shopId, userId, nickname, profilePic, text, rate })
     const shop = await Shop.findById(shopId) 
-	shop.reviews.push(review);
-    shop.save()
+    review.save(function (){
+        shop.reviews.push(review.reviewId);
+    })
     
     res.sendStatus(200)
     }catch (err) {
@@ -32,10 +34,18 @@ router.post('/:shopId', async(req, res) => {
 
 // 리뷰 수정하기
 router.put('/:shopId/:reviewId', async(req, res) => {
-	const { shopId } = req.params
+	const { reviewId } = req.params
 	const { text, rate } = req.body
+
+    if (text === '') {
+        res.status(400).send({
+          errorMessage: '내용을 작성해주세요.',
+        });
+        return;
+      }
+
 	try{
-    await Review.findByIdAndUpdate(shopId, {
+    await Review.findByIdAndUpdate(reviewId, {
         $set: { 
             text : text, 
             rate : rate,
@@ -74,13 +84,74 @@ router.get('/:shopId', async(req, res) => {
     const { rate } = req.body;
 
     try{
-    const shop = await Shop.findOne({ shopId : shopId }).exec()
-    const rateReviews = shop.filter(shop => shop.review.rate === rate);
+    const reviews = await review.find({ shopId : shopId }).exec()
+    const rateReviews = reviews.filter(review => review.rate === rate);
     res.json({ rateReviews })
+    
     }catch(err) {
         console.log(err)
         res.status(400).json({
             errorMessage: " 리뷰 불러오기 실패"
+        })
+    }
+});
+
+//가고싶다(즐겨찾기)
+router.post('/:shopId/mark', async(req,res) => {
+    const { shopId } = req.body
+    const { userId } = res.locals
+    
+    try{
+        const shop = await Shop.findById(shopId).exec()
+        const user = await User.findById(userId).exec()
+        
+        if (shop.markedUser.indexOf(userId) === -1) {
+        shop.markedUser.push(userId);
+        shop.save();
+        };
+        
+        if (user.markedShop.indexOf(shopId) === -1) {
+            user.markedShop.push(shopId);
+            user.save();
+        };
+
+        res.status(200).json({ mark: true })
+
+    }catch(err){
+        console.log(err)
+        res.status(400).json({
+            mark: false,
+            errorMessage: "가고싶다 등록 실패"
+        })
+    }
+});
+
+router.post('/:shopId/unmark', async (req, res) => {
+    const { shopId } = req.body
+    const { userId } = res.locals
+    
+    try{
+    
+        const shop = await Shop.findById(shopId).exec()
+        const user = await User.findById(userId).exec()
+
+        if (!shop.markedUser.indexOf(userId) === -1) {
+            shop.markedUser.remove(userId);
+            shop.save();
+        };
+
+        if (!user.markedShop.indexOf(shopId) === -1) {
+            user.markedShop.remove(shopId);
+            user.save();
+        };
+
+        res.status(200).json({ unmark: true })
+
+    }catch(err){
+        console.log(err)
+        res.status(400).json({
+            unmark: false,
+            errorMessage: "가고싶다 등록 실패"
         })
     }
 });

@@ -5,6 +5,11 @@ export const reviewSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    userIds: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
     nickname: {
         type: String,
         required: true,
