@@ -21,6 +21,7 @@ router.post('/:shopId', async(req, res) => {
     const shop = await Shop.findById(shopId) 
     review.save(function (){
         shop.reviews.push(review.reviewId);
+        review.users.push(userId)
     })
     
     res.sendStatus(200)
@@ -34,7 +35,7 @@ router.post('/:shopId', async(req, res) => {
 
 // 리뷰 수정하기
 router.put('/:shopId/:reviewId', async(req, res) => {
-	const { reviewId } = req.params
+	const { shopId, reviewId } = req.params
 	const { text, rate } = req.body
 
     if (text === '') {
@@ -45,12 +46,17 @@ router.put('/:shopId/:reviewId', async(req, res) => {
       }
 
 	try{
-    await Review.findByIdAndUpdate(reviewId, {
+    await Review.findByIdAndUpdate( 
+        {
+            $and: [{ shopId }, { reviewId }],
+        },
+        {
         $set: { 
             text : text, 
             rate : rate,
         }}).exec()
 		res.sendStatus(200)
+
 	} catch(err) {
 		console.error(err)
 		res.status(400).json({
@@ -61,8 +67,8 @@ router.put('/:shopId/:reviewId', async(req, res) => {
 
 //리뷰 삭제하기
 router.delete('/:shopId/:reviewId', async (req, res) => {
-	const { shopId } = req.params
-	const { reviewId } = req.body
+	const { shopId, reviewId } = req.params
+
 	try {
 	const shop = await Shop.findById(shopId).exec()
 	await shop.reviews.id(reviewId).remove()
@@ -84,9 +90,12 @@ router.get('/:shopId', async(req, res) => {
     const { rate } = req.body;
 
     try{
-    const reviews = await review.find({ shopId : shopId }).exec()
-    const rateReviews = reviews.filter(review => review.rate === rate);
-    res.json({ rateReviews })
+    const reviews = await Review.find(
+        { 
+            $and: [{ shopId }, { rate }]
+        }).exec()
+    
+    res.json({ reviews })
     
     }catch(err) {
         console.log(err)
