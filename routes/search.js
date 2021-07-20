@@ -23,8 +23,13 @@ router.get('/:word', async(req, res) => {
     const fuse = new Fuse(shops,options)
     const result = fuse.search(searchWord)
 
-    res.status(200).json( result )
-
+    if (result.length === 0 ){
+        res.status(400).send({
+            ErrorMessage: `${searchWord}에 대한 검색결과가 없습니다.`
+        })
+    }else{
+        res.status(200).json( result )
+    }
     }catch(err){
         console.log(err)
         res.status(400).send({
