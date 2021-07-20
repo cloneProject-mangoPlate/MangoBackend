@@ -2,21 +2,16 @@ import express from "express";
 import User from "../models/user.js";
 import passport from "passport";
 import request from "request";
+import jwt from "jsonwebtoken";
 
 // strategy import
 import Kakao from "passport-kakao";
 
 const router = express.Router();
 router.use(passport.initialize());
-
 const KakaoStrategy = Kakao.Strategy;
 
-// router.get("/login", function (req, res) {
-//   res.render("login");
-// });
-
 // 카카오로그인
-
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -29,19 +24,20 @@ passport.use(
   "kakao",
   new KakaoStrategy(
     {
-      clientID: "88806fd7f63dd24d3065af028f601b16",
+      clientID: process.env.KAKAO_KEY,
       callbackURL: "/api/social/kakao/callback", // 위에서 설정한 Redirect URI
     },
     async (accessToken, refreshToken, profile, done) => {
-      const user = profile._json.kakao_account;
-      // user.provider = profile.provider;
-      // req.session.save(function(err){
-
-      // })
-      user.token = accessToken;
-      console.log("토큰!", accessToken);
-      console.log("프로필이거", profile);
-      done(null, user);
+      try {
+        const user = profile._json.kakao_account;
+        user.token = accessToken;
+        console.log("토큰!", accessToken);
+        console.log("프로필이거", profile);
+        done(null, user);
+      } catch (error) {
+        console.error(error);
+        res.status(401).redirect("/");
+      }
     }
   )
 );
@@ -57,21 +53,45 @@ function authSuccess(req, res) {
       json: true,
     },
     async function (error, response, body) {
-      const { profileImageURL } = body;
-      console.log(profileImageURL);
-
-      const myuser = await User.findOne({
-        userName: user,
-        email: email,
-      });
-      if (!myuser) {
-        await User.create({
+      try {
+        const { profileImageURL } = body;
+        const myuser = await User.findOne({
           userName: user,
           email: email,
         });
-        res.send({ profileImageURL, user, token });
-      } else {
-        res.send({ profileImageURL, user, token });
+        // 이미 가입된 유저가 없으면 User 생성 후 토큰 생성하여 전달
+        if (!myuser) {
+          await User.create({
+            userName: user,
+            email: email,
+          });
+          const newuser = await User.findOne({
+            userName: user,
+            email: email,
+          });
+          // 토큰 정보: 유저아이디, 이름, 만료시간 24h
+          const userInfo = {
+            userId: newuser.userId,
+            nickname: newuser.userName,
+          };
+          const options = {
+            expiresIn: "24h",
+          };
+          const mytoken = jwt.sign(userInfo, process.env.SECRET_KEY, options);
+          res.send({ profileImageURL, mytoken });
+        }
+        // 이미 가입된 유저가 있다면 jwt토큰 생성하여 전달
+        else {
+          const userInfo = { userId: myuser.userId, userName: myuser.userName };
+          const options = {
+            expiresIn: "24h",
+          };
+          const mytoken = jwt.sign(userInfo, process.env.SECRET_KEY, options);
+          res.send({ profileImageURL, mytoken });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(401).redirect("/");
       }
     }
   );

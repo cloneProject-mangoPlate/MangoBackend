@@ -13,5 +13,4 @@ router.use("/users", usersRouter);
 router.use("/search", searchRouter);
 // router.use(auth);
 
-
 export default router;
