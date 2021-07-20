@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import router from "./api/index.js";
+import router from "./routes/index.js";
 import dotenv from 'dotenv'
 import "./models/index.js";
 
@@ -14,5 +14,5 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api", router);
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log("서버 연결");
+    console.log("서버 연결 성공");
 });
