@@ -14,8 +14,8 @@ export const shopSchema = new mongoose.Schema({
     required: true,
   },
   views: {
-    type: Array,
-    default: [],
+    type: Number,
+    default: 0,
   },
   reviews: {
     type: Array,
