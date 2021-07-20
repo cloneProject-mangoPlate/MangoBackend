@@ -22,7 +22,8 @@
     "multer-s3": "^2.9.0",
     "nodemon": "^2.0.12",
     "npm": "^7.19.1",
-    "passport-kakao": "^1.0.1"
+    "passport-kakao": "^1.0.1",
+    "puppeteer": "^10.1.0"
   },
   "type": "module"
 }
