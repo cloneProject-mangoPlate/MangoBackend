@@ -7,12 +7,23 @@ export const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
   },
   reviews: {
     type: Array,
     default: [],
   },
+  likes: {
+    type: Array,
+    default: [],
+  }
+});
+
+userSchema.virtual('userId').get(function () {
+  return this._id.toHexString();
+});
+
+userSchema.set('toJSON', {
+  virtuals: true,
 });
 
 export default mongoose.model("User", userSchema);

@@ -17,14 +17,14 @@ export const shopSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  reviews: {
-    type: Array,
-    default: [],
-  },
-  likes: {
-    type: Array,
-    default: [],
-  },
+  reviews: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  }],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   data: {
     type: Array,
     required: true,

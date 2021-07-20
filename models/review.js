@@ -5,15 +5,11 @@ export const reviewSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    userIds: {
+    userIds: [{
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User',
-    },
-    nickname: {
-        type: String,
-        required: true,
-    },
+    }],
     profilePic: {
         type: String,
         required: true,

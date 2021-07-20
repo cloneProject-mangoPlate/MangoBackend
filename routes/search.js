@@ -4,8 +4,8 @@ import Fuse from 'fuse.js'
 
 const router = express.Router();
 
-router.post('/:word', async(req, res) => {
-    const { searchWord } = req.params;
+router.get('/:word', async(req, res) => {
+    const searchWord = decodeURIComponent(req.params.word)
 
     if (searchWord === "") {
         res.status(400).send({
@@ -15,10 +15,9 @@ router.post('/:word', async(req, res) => {
 
     try{
     const shops = await Shop.find()
-        
     const options = {
         includeScore: true,
-        keys: []
+        keys: ["tags", "menuList","shopName"]
     }
     
     const fuse = new Fuse(shops,options)
