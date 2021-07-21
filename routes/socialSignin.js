@@ -2,15 +2,26 @@ import express from "express";
 import passport from "passport";
 import request from "request";
 import jwt from "jsonwebtoken";
+import session from "express-session";
+import dotenv from "dotenv";
+dotenv.config();
 
 // strategy import
 import Kakao from "passport-kakao";
 import User from "../models/user.js";
 
 const router = express.Router();
+router.use(
+  session({
+    secret: "SECRET_CODE",
+    resave: true,
+    saveUninitialized: false,
+    cookie: { maxAge: 2400 * 60 * 60 },
+  })
+);
 router.use(passport.initialize());
 const KakaoStrategy = Kakao.Strategy;
-
+router.use(passport.session());
 // 카카오로그인
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -30,8 +41,7 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       const user = profile._json.kakao_account;
       user.token = accessToken;
-      console.log("토큰!", accessToken);
-      console.log("프로필이거", profile);
+
       done(null, user);
     }
   )
@@ -50,11 +60,15 @@ function authSuccess(req, res) {
     async function (error, response, body) {
       try {
         const { profileImageURL } = body;
+        req.user.profileImg = profileImageURL;
         const myuser = await User.findOne({
           userName: user,
           email,
         });
-        // 이미 가입된 유저가 없으면 User 생성 후 토큰 생성하여 전달
+        const myemail = await User.findOne({
+          email,
+        });
+        // 이미 가입된 유저가 없으면 User 생성
         if (!myuser) {
           await User.create({
             userName: user,
@@ -64,25 +78,19 @@ function authSuccess(req, res) {
             userName: user,
             email,
           });
-          // 토큰 정보: 유저아이디, 이름, 만료시간 24h
-          const userInfo = {
-            userId: newuser.userId,
-            nickname: newuser.userName,
-          };
-          const options = {
-            expiresIn: "24h",
-          };
-          const mytoken = jwt.sign(userInfo, process.env.SECRET_KEY, options);
-          res.send({ profileImageURL, mytoken });
+          req.user.userId = newuser.userId;
+          res.redirect("/api/social/user");
         }
-        // 이미 가입된 유저가 있다면 jwt토큰 생성하여 전달
+        // 카카오 닉네임 갱신시 디비 유저 정보 업뎃
+        else if (!myuser && myemail) {
+          await User.updateOne({ email }, { $set: { userName: user } });
+          req.user.userId = myemail.userId;
+          res.redirect("/api/social/user");
+        }
+        // 이미 가입된 유저가 있다면
         else {
-          const userInfo = { userId: myuser.userId, userName: myuser.userName };
-          const options = {
-            expiresIn: "24h",
-          };
-          const mytoken = jwt.sign(userInfo, process.env.SECRET_KEY, options);
-          res.send({ profileImageURL, mytoken });
+          req.user.userId = myuser.userId;
+          res.redirect("/api/social/user");
         }
       } catch (error) {
         console.error(error);
@@ -92,14 +100,20 @@ function authSuccess(req, res) {
   );
 }
 
+// 클라이언트에서 세션 쿠키있으면 get 요청 후에
+// jwt 토큰 생성
+router.get("/user", (req, res) => {
+  const { userId, profile, profileImg } = req.user;
+  const userInfo = { userId: userId, userName: profile.nickname };
+  const options = {
+    expiresIn: "24h",
+  };
+  console.log(req.user);
+  const token = jwt.sign(userInfo, process.env.SECRET_KEY, options);
+  res.send({ token, profileImg });
+});
+
 router.get("/kakao", passport.authenticate("kakao"));
-router.get(
-  "/kakao/callback",
-  passport.authenticate("kakao"),
-  authSuccess,
-  (req, res) => {
-    res.redirect("/");
-  }
-);
+router.get("/kakao/callback", passport.authenticate("kakao"), authSuccess);
 
 export default router;
