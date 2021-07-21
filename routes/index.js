@@ -11,6 +11,6 @@ router.use("/shops", shopsRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/search", searchRouter);
 router.use("/social", socialRouter);
-// router.use(auth);
+router.use(auth);
 
 export default router;

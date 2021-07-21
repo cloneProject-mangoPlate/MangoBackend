@@ -8,8 +8,8 @@ const router = express.Router();
 //리뷰 작성하기
 router.post('/:shopId', upload.array('image'), async(req, res) => {
     const { shopId } = req.params;
-    const { profilePic, text, rate, userId} = req.body;
-    // const { userId } = res.locals
+    const { profilePic, text, rate } = req.body;
+    const { userId } = res.locals
     if (text === '') {
         res.status(400).send({
           errorMessage: '내용을 작성해주세요.',

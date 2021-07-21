@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/:word', async(req, res) => {
     const searchWord = decodeURIComponent(req.params.word)
-    // const { userId }= res.locals
+    const { userId }= res.locals
 
     if (searchWord === "") {
         res.status(400).send({
@@ -59,9 +59,9 @@ router.get('/:word', async(req, res) => {
 });
 
 router.get('/', async(req,res) => {
-    // const { userId }= res.locals
+    const { userId }= res.locals
 
-    // const recentSearch = await User.findById(userId).recentSearch
+    const recentSearch = await User.findById(userId).recentSearch
     
     const recomSearch = ["치킨", "찜닭", "파스타", "떡볶이", "청담 맛집", "백종원", "맥주"]
     
@@ -82,7 +82,7 @@ router.get('/', async(req,res) => {
 //아니면 프론트에서 다시 최근검색어 렌더링해준다 = res.status(200)
 router.get('/recent', async(req,res) => {
     const { deleteWord } = req.body
-    // const { userId }= res.locals
+    const { userId }= res.locals
 
     const recentSearch = await User.findByIdAndDelete()
 

@@ -2,11 +2,12 @@ import express from "express";
 import passport from "passport";
 import request from "request";
 import jwt from "jsonwebtoken";
-
+import dotenv from 'dotenv'
 // strategy import
 import Kakao from "passport-kakao";
 import User from "../models/user.js";
 
+dotenv.config()
 const router = express.Router();
 router.use(passport.initialize());
 const KakaoStrategy = Kakao.Strategy;

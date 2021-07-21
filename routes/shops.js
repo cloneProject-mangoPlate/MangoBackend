@@ -17,8 +17,8 @@ router.get("/", async (req, res) => {
 
 router.get("/:keyword/:userId", async (req, res) => {
   try {
-    // const { userId } = res.locals
-    const { keyword, userId } = req.params;
+    const { userId } = res.locals
+    const { keyword } = req.params;
     console.log(req.params);
 
     const shops = await Shop.find({
