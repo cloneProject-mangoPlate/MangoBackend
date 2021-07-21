@@ -98,7 +98,7 @@ router.put('/:reviewId', upload.array('image'), async(req, res) => {
         console.log(text, rate, key)
         for(let i in key){
             console.log(key[i])
-        S3.deleteObject({		    //이미지 삭제
+        S3.deleteObject({		    
             Bucket: 'myh99bucket', 
             Key: key[i]
           }, (err, data) => {
@@ -139,7 +139,7 @@ router.delete('/:shopId/:reviewId', async (req, res) => {
 
     for(let i in key){
         console.log(key[i])
-    S3.deleteObject({		    //이미지 삭제
+    S3.deleteObject({		    
         Bucket: 'myh99bucket', 
         Key: key[i]
       }, (err, data) => {
