@@ -15,6 +15,10 @@ export const userSchema = new mongoose.Schema({
   likes: {
     type: Array,
     default: [],
+  },
+  recentSearch: {
+    type: Array,
+    default: [],
   }
 });
 

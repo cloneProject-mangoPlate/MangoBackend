@@ -9,7 +9,6 @@ router.post('/:shopId', async(req, res) => {
     const { shopId } = req.params;
     const { nickname, profilePic, text, rate, userId} = req.body;
     // const { userId } = res.locals
-       console.log(nickname, profilePic, text, rate, userId)
     if (text === '') {
         res.status(400).send({
           errorMessage: '내용을 작성해주세요.',
@@ -22,7 +21,8 @@ router.post('/:shopId', async(req, res) => {
     const shop = await Shop.findById(shopId) 
     await review.save(async function (){
         try{
-        shop.reviews.push(ObjectID(review._Id));
+            console.log(review.reviewId)
+        shop.reviews.push(ObjectID(review.reviewId));
         review.userIds.push(ObjectID(userId))
         await shop.save()
         await review.save()

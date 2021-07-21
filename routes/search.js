@@ -1,5 +1,6 @@
 import express from 'express'
 import Shop from '../models/shop.js'
+import User from '../models/user.js'
 import Fuse from 'fuse.js'
 
 const router = express.Router();
@@ -14,6 +15,10 @@ router.get('/:word', async(req, res) => {
     }
 
     try{
+    const user = await User.findById(userId)
+    user.recentSearch.push(searchWord);
+    await user.save()
+    
     const shops = await Shop.find()
     const options = {
         includeScore: true,
