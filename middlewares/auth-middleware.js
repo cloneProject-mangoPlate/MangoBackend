@@ -1,5 +1,4 @@
 import User from "../models/user.js";
-import request from "request";
 
 export default (req, res, next) => {
   const { authorization } = req.headers;
@@ -13,31 +12,15 @@ export default (req, res, next) => {
   }
 
   try {
-    const options = {
-      uri: "https://kapi.kakao.com/v1/user/access_token_info",
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    request(options, function (err, response, body) {
-      //callback
-    });
+    const { userId } = jwt.verify(tokenValue, process.env.SECRET_KEY);
 
-    request.get(
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        url: "https://kapi.kakao.com/v1/user/access_token_info",
-      },
-      function (error, response, body) {
-        console.log(response);
-        if (response) {
-          res.locals.userId = id;
-          next();
-        } if(error){
-          throw 
-        }
-        // const { id } = body;
-        // console.log(id);
+    User.findById(userId).then((user) => {
+      if (user === null) {
+        throw new Error("invalidUser");
       }
-    );
+      res.locals.userId = userId;
+      next();
+    });
   } catch (err) {
     if (err.name === "TokenExpiredError") {
       res.status(419).send({ message: "token 만료" });
@@ -48,5 +31,3 @@ export default (req, res, next) => {
     }
   }
 };
-
-

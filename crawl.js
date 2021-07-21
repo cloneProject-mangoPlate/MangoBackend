@@ -146,19 +146,19 @@ const main = async (crawlpage) => {
   await browser.close();
 };
 let page_list = [
-  "https://www.mangoplate.com/top_lists/gwangju_donggu",
   "https://www.mangoplate.com/top_lists/759_jjimdak",
   "https://www.mangoplate.com/top_lists/1359_korean_pub",
   "https://www.mangoplate.com/top_lists/979_fried_chicken",
   "https://www.mangoplate.com/top_lists/2858_anju_cheongdam",
-  "https://www.mangoplate.com/top_lists/tantannoodle_top5",
-  "https://www.mangoplate.com/top_lists/1268_daegu",
-  "https://www.mangoplate.com/top_lists/1334_lamb",
-  "https://www.mangoplate.com/top_lists/916_pub",
-  "https://www.mangoplate.com/top_lists/2855_hangover_itaewon",
-  "https://www.mangoplate.com/top_lists/968_duck",
+  // "https://www.mangoplate.com/top_lists/2855_hangover_itaewon",
   "https://www.mangoplate.com/top_lists/2857_familydinner_seoraevillage",
-  "https://www.mangoplate.com/top_lists/2841_kidsfriendly_gangneung",
+  // "https://www.mangoplate.com/top_lists/2841_kidsfriendly_gangneung",
+  "https://www.mangoplate.com/top_lists/tantannoodle_top5",
+  // "https://www.mangoplate.com/top_lists/1268_daegu",
+  // "https://www.mangoplate.com/top_lists/1334_lamb",
+  // "https://www.mangoplate.com/top_lists/916_pub",
+  // "https://www.mangoplate.com/top_lists/968_duck",
+  // "https://www.mangoplate.com/top_lists/gwangju_donggu",
 ];
 for (let i = 0; i < page_list.length; i++) {
   await main(page_list[i]);

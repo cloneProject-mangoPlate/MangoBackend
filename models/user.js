@@ -19,14 +19,14 @@ export const userSchema = new mongoose.Schema({
   recentSearch: {
     type: Array,
     default: [],
-  }
+  },
 });
 
-userSchema.virtual('userId').get(function () {
+userSchema.virtual("userId").get(function () {
   return this._id.toHexString();
 });
 
-userSchema.set('toJSON', {
+userSchema.set("toJSON", {
   virtuals: true,
 });
 

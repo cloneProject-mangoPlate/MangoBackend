@@ -1,13 +1,12 @@
 import express from "express";
-import User from "../models/user.js";
 import passport from "passport";
 import request from "request";
 import jwt from "jsonwebtoken";
-import dotenv from 'dotenv'
+
 // strategy import
 import Kakao from "passport-kakao";
+import User from "../models/user.js";
 
-dotenv.config()
 const router = express.Router();
 router.use(passport.initialize());
 const KakaoStrategy = Kakao.Strategy;
@@ -29,23 +28,18 @@ passport.use(
       callbackURL: "/api/social/kakao/callback", // 위에서 설정한 Redirect URI
     },
     async (accessToken, refreshToken, profile, done) => {
-      try {
-        const user = profile._json.kakao_account;
-        user.token = accessToken;
-        console.log("토큰!", accessToken);
-        console.log("프로필이거", profile);
-        done(null, user);
-      } catch (error) {
-        console.error(error);
-        res.status(401).redirect("/");
-      }
+      const user = profile._json.kakao_account;
+      user.token = accessToken;
+      console.log("토큰!", accessToken);
+      console.log("프로필이거", profile);
+      done(null, user);
     }
   )
 );
 
 function authSuccess(req, res) {
   const { profile, email, token } = req.user;
-  let user = profile.nickname;
+  const user = profile.nickname;
   console.log("social login test", user, email, token);
   request.post(
     {
@@ -58,17 +52,17 @@ function authSuccess(req, res) {
         const { profileImageURL } = body;
         const myuser = await User.findOne({
           userName: user,
-          email: email,
+          email,
         });
         // 이미 가입된 유저가 없으면 User 생성 후 토큰 생성하여 전달
         if (!myuser) {
           await User.create({
             userName: user,
-            email: email,
+            email,
           });
           const newuser = await User.findOne({
             userName: user,
-            email: email,
+            email,
           });
           // 토큰 정보: 유저아이디, 이름, 만료시간 24h
           const userInfo = {
@@ -99,6 +93,13 @@ function authSuccess(req, res) {
 }
 
 router.get("/kakao", passport.authenticate("kakao"));
-router.get("/kakao/callback", passport.authenticate("kakao"), authSuccess);
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao"),
+  authSuccess,
+  (req, res) => {
+    res.redirect("/");
+  }
+);
 
 export default router;
