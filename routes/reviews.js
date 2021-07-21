@@ -72,8 +72,8 @@ router.post('/:shopId', upload.array('image'), async(req, res) => {
 });
 
 // 리뷰 수정하기
-router.put('/:shopId/:reviewId', upload.array('image'), async(req, res) => {
-	const { shopId, reviewId } = req.params
+router.put('/:reviewId', upload.array('image'), async(req, res) => {
+	const { reviewId } = req.params
 	const { text, rate } = req.body
 
     if (text === '') {
@@ -85,10 +85,7 @@ router.put('/:shopId/:reviewId', upload.array('image'), async(req, res) => {
 
 	try{
     if(!req.files){
-    await Review.findOneAndUpdate( 
-        {
-            $and: [{ shopId }, { reviewId }],
-        },
+    await Review.findByIdAndUpdate(reviewId,
         {
         $set: { 
             text : text, 
@@ -98,8 +95,9 @@ router.put('/:shopId/:reviewId', upload.array('image'), async(req, res) => {
     }else{
         const review = await Review.findById(reviewId)
         const key = review['reviewImageKey']
-        console.log(key)
+        console.log(text, rate, key)
         for(let i in key){
+            console.log(key[i])
         S3.deleteObject({		    //이미지 삭제
             Bucket: 'myh99bucket', 
             Key: key[i]
@@ -110,10 +108,7 @@ router.put('/:shopId/:reviewId', upload.array('image'), async(req, res) => {
 
         const newReviewImage = req.files.map(file => file.location);
         const newReviewImageKey = req.files.map(file => file.key);
-        await Review.findOneAndUpdate( 
-            {
-                $and: [{ shopId }, { reviewId }],
-            },
+        await Review.findOneAndUpdate(reviewId,
             {
             $set: { 
                 text : text, 
@@ -137,9 +132,22 @@ router.delete('/:shopId/:reviewId', async (req, res) => {
 
 	try {
 	const shop = await Shop.findById(shopId).exec()
-	await shop.reviews.id(reviewId).remove()
+	shop.reviews.remove(reviewId)
+    
+    const review = await Review.findById(reviewId)
+    const key = review['reviewImageKey']
+
+    for(let i in key){
+        console.log(key[i])
+    S3.deleteObject({		    //이미지 삭제
+        Bucket: 'myh99bucket', 
+        Key: key[i]
+      }, (err, data) => {
+        if (err) { throw err; }
+      })
+    }		
     await Review.findByIdAndDelete(reviewId).exec()
-			
+
 		res.sendStatus(200)	
 	}catch(err) {
 		
