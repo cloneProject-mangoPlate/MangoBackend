@@ -1,5 +1,9 @@
 import Main from "./models/main.js";
 import { app, express } from "./index.js";
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 let array = [
   [
     "https://media.vlpt.us/images/soujinko/post/3c613f6a-b3da-4c91-adae-c46ae689b567/6.jpg?w=768",
