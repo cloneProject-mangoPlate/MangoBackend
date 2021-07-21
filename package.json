@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon ./index.js",
-    "crawl": "npx nodemon ./crawl.js"
+    "crawl": "npx nodemon ./crawl.js",
+    "crawl2": "npx nodemon ./crawl2.js"
   },
   "repository": "git+https://github.com/dennis9352/MP_CloneCoding_backend.git",
   "keywords": [],
@@ -29,5 +30,13 @@
     "puppeteer": "^10.1.0",
     "request": "^2.88.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "2.3.2"
+  }
 }
