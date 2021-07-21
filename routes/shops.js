@@ -16,12 +16,12 @@ router.get("/", async (req, res) => {
     res.status(400).send("음식점 정보가 없습니다.");
   }
 });
-
-router.get("/:keyword/:userId", async (req, res) => {
+// 로그인 했으면 파람에 유저아이디 붙이기
+router.get("/:keyword", async (req, res) => {
   try {
-    const { userId } = res.locals
+    // console.log("사용자", req);
     const { keyword } = req.params;
-    console.log(req.params);
+    console.log(keyword);
 
     const shops = await Shop.find({
       keyword,
@@ -30,13 +30,15 @@ router.get("/:keyword/:userId", async (req, res) => {
     // 리뷰들 rated 카테고리별 개수 전달
     //   키워드로 찾을 수 없음 ID값으로 찾기
     if (shops.length === 0) {
+      let visited;
       const shop = await Shop.findById(keyword)
         .populate("reviews")
         .sort("-created_at");
-
-      // 유저 방문 여부 판단
-      const visits = shop.reviews.map((s) => s.userIds.join());
-      const visited = visits.includes(userId) ? true : false;
+      // if (userId) {
+      //   // 유저 방문 여부 판단
+      //   const visits = shop.reviews.map((s) => s.userIds.join());
+      //   visited = visits.includes(userId) ? true : false;
+      // }
 
       // 점수 카테고리별 개수
       const rates = { highsRate: 0, middleRate: 0, lowsRate: 0 };
@@ -51,9 +53,9 @@ router.get("/:keyword/:userId", async (req, res) => {
       });
       const shopOne = {
         shop: shop,
-        visited: visited,
         rates: rates,
       };
+      // shopOne.visited = userId ? visited : false;
 
       console.log(shopOne);
       res.json({ shopOne });
