@@ -22,7 +22,12 @@ export const reviewSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    
+    reviewImage: {
+        type: Array,
+    },
+    reviewImageKey:{
+        type: Array,
+    }
 }, {timestamps: true});
 
 reviewSchema.virtual('reviewId').get(function () {

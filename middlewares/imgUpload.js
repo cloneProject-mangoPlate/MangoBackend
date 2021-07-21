@@ -1,9 +1,9 @@
 import multer from "multer";
 import multerS3 from 'multer-s3'
 import aws from 'aws-sdk'
-// import path from 'path';
-// const __dirname = path.resolve();
-// aws.config.loadFromPath(__dirname + '/config/s3.json');
+import path from 'path';
+const __dirname = path.resolve();
+aws.config.loadFromPath(__dirname + '/config/s3.json');
 
   const S3 = new aws.S3();
   const upload = multer({
