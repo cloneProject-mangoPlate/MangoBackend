@@ -80,12 +80,12 @@ router.get('/', async(req,res) => {
 
 //todo 해당 검색어 삭제후 다시 최근검색어 보낸다 = res.json(recentSearch)
 //아니면 프론트에서 다시 최근검색어 렌더링해준다 = res.status(200)
-router.get('/recent', async(req,res) => {
-    const { deleteWord } = req.body
-    const { userId }= res.locals
+// router.get('/recent', async(req,res) => {
+//     const { deleteWord } = req.body
+//     const { userId }= res.locals
 
-    const recentSearch = await User.findByIdAndDelete()
+//     const recentSearch = await User.findByIdAndDelete()
 
-    res.json(popularSearch)
-})
+//     res.json(popularSearch)
+// })
 export default router;

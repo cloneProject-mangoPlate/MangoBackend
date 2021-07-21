@@ -1,6 +1,8 @@
 import express from "express";
 import Shop from "../models/shop.js";
 import Main from "../models/main.js";
+import User from "../models/user.js"
+import auth from "../middlewares/auth-middleware.js";
 
 const router = express.Router();
 
@@ -72,6 +74,67 @@ router.get("/:keyword/:userId", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).send("음식점 정보가 없습니다.");
+  }
+});
+
+
+//가고싶다(즐겨찾기)
+router.post('/:shopId/like',auth, async(req,res) => {
+  const { shopId } = req.params
+  const { userId } = res.locals
+  
+  try{
+      const shop = await Shop.findById(shopId).exec()
+      const user = await User.findById(userId).exec()
+      
+      if (shop.likes.indexOf(userId) === -1) {
+      shop.likes.push(userId);
+      shop.save();
+      };
+      
+      if (user.likes.indexOf(shopId) === -1) {
+          user.likes.push(shopId);
+          user.save();
+      };
+
+      res.status(200).json({ like: true })
+
+  }catch(err){
+      console.log(err)
+      res.status(400).json({
+          like: false,
+          errorMessage: "가고싶다 등록 실패"
+      })
+  }
+});
+
+router.post('/:shopId/unlike',auth, async (req, res) => {
+  const { shopId } = req.params
+  const { userId } = res.locals
+  
+  try{
+  
+      const shop = await Shop.findById(shopId).exec()
+      const user = await User.findById(userId).exec()
+
+      if (!shop.likes.indexOf(userId) === -1) {
+          shop.likes.remove(userId);
+          shop.save();
+      };
+
+      if (!user.likes.indexOf(shopId) === -1) {
+          user.likes.remove(shopId);
+          user.save();
+      };
+
+      res.status(200).json({ unlike: true })
+
+  }catch(err){
+      console.log(err)
+      res.status(400).json({
+          unlike: false,
+          errorMessage: "가고싶다 등록 실패"
+      })
   }
 });
 
