@@ -17,4 +17,4 @@ app.listen(process.env.PORT || 3000, () => {
     console.log("서버 연결 성공");
 });
 
-export default {app, express}
+export { app, express }

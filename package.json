@@ -13,6 +13,7 @@
   "author": "고수진 이경원",
   "license": "ISC",
   "dependencies": {
+    "bson-objectid": "^2.0.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -23,8 +24,10 @@
     "multer-s3": "^2.9.0",
     "nodemon": "^2.0.12",
     "npm": "^7.19.1",
+    "passport": "^0.4.1",
     "passport-kakao": "^1.0.1",
-    "puppeteer": "^10.1.0"
+    "puppeteer": "^10.1.0",
+    "request": "^2.88.2"
   },
   "type": "module"
 }
