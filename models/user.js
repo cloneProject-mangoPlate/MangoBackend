@@ -15,4 +15,11 @@ export const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.virtual("userId").get(function () {
+  return this._id.toHexString();
+});
+userSchema.set("toJSON", {
+  virtuals: true,
+});
+
 export default mongoose.model("User", userSchema);
