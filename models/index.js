@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const connect = () => {
-	if (process.env.DEBUG !== 'conclusion') {
+	if (process.env.DEBUG !== 'false') {
 		mongoose.set('debug', true)
 	}
 }

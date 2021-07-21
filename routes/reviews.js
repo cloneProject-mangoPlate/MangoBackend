@@ -2,12 +2,13 @@ import express from "express";
 import Review from '../models/review.js'
 import Shop from '../models/shop.js'
 import ObjectID from "bson-objectid";
+import { upload, S3 } from "../middlewares/imgUpload.js"
 const router = express.Router();
 
 //리뷰 작성하기
 router.post('/:shopId', async(req, res) => {
     const { shopId } = req.params;
-    const { nickname, profilePic, text, rate, userId} = req.body;
+    const { profilePic, text, rate, userId} = req.body;
     // const { userId } = res.locals
     if (text === '') {
         res.status(400).send({
@@ -17,7 +18,7 @@ router.post('/:shopId', async(req, res) => {
       }
 
     try{
-    const review = new Review({ shopId, userId, nickname, profilePic, text, rate })
+    const review = new Review({ shopId, userId, profilePic, text, rate })
     const shop = await Shop.findById(shopId) 
     await review.save(async function (){
         try{

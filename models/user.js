@@ -9,8 +9,8 @@ export const userSchema = new mongoose.Schema({
     type: String,
   },
   reviews: {
-    type: Array,
-    default: [],
+    type: Number,
+    default: 0,
   },
   likes: {
     type: Array,
