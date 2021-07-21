@@ -9,8 +9,8 @@ export const userSchema = new mongoose.Schema({
     type: String,
   },
   reviews: {
-    type: Array,
-    default: [],
+    type: Number,
+    default: 0,
   },
   likes: {
     type: Array,
@@ -19,20 +19,13 @@ export const userSchema = new mongoose.Schema({
   recentSearch: {
     type: Array,
     default: [],
-  }
-});
-
-userSchema.virtual('userId').get(function () {
-  return this._id.toHexString();
-});
-
-userSchema.set('toJSON', {
-  virtuals: true,
+  },
 });
 
 userSchema.virtual("userId").get(function () {
   return this._id.toHexString();
 });
+
 userSchema.set("toJSON", {
   virtuals: true,
 });
