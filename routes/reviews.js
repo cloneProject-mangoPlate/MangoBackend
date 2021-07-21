@@ -1,14 +1,14 @@
 import express from "express";
 import Review from '../models/review.js'
 import Shop from '../models/shop.js'
+import ObjectID from "bson-objectid";
 const router = express.Router();
 
 //리뷰 작성하기
 router.post('/:shopId', async(req, res) => {
     const { shopId } = req.params;
-    const { nickname, profilePic, text, rate } = req.body;
-    const { userId } = res.locals
-       
+    const { nickname, profilePic, text, rate, userId} = req.body;
+    // const { userId } = res.locals
     if (text === '') {
         res.status(400).send({
           errorMessage: '내용을 작성해주세요.',
@@ -19,9 +19,16 @@ router.post('/:shopId', async(req, res) => {
     try{
     const review = new Review({ shopId, userId, nickname, profilePic, text, rate })
     const shop = await Shop.findById(shopId) 
-    review.save(function (){
-        shop.reviews.push(review.reviewId);
-        review.users.push(userId)
+    await review.save(async function (){
+        try{
+            console.log(review.reviewId)
+        shop.reviews.push(ObjectID(review.reviewId));
+        review.userIds.push(ObjectID(userId))
+        await shop.save()
+        await review.save()
+        }catch(err){
+            console.log(err)
+        }
     })
     
     res.sendStatus(200)
@@ -106,7 +113,7 @@ router.get('/:shopId', async(req, res) => {
 });
 
 //가고싶다(즐겨찾기)
-router.post('/:shopId/mark', async(req,res) => {
+router.post('/:shopId/like', async(req,res) => {
     const { shopId } = req.body
     const { userId } = res.locals
     
@@ -114,28 +121,28 @@ router.post('/:shopId/mark', async(req,res) => {
         const shop = await Shop.findById(shopId).exec()
         const user = await User.findById(userId).exec()
         
-        if (shop.markedUser.indexOf(userId) === -1) {
-        shop.markedUser.push(userId);
+        if (shop.likes.indexOf(userId) === -1) {
+        shop.likes.push(userId);
         shop.save();
         };
         
-        if (user.markedShop.indexOf(shopId) === -1) {
-            user.markedShop.push(shopId);
+        if (user.likes.indexOf(shopId) === -1) {
+            user.likes.push(shopId);
             user.save();
         };
 
-        res.status(200).json({ mark: true })
+        res.status(200).json({ like: true })
 
     }catch(err){
         console.log(err)
         res.status(400).json({
-            mark: false,
+            like: false,
             errorMessage: "가고싶다 등록 실패"
         })
     }
 });
 
-router.post('/:shopId/unmark', async (req, res) => {
+router.post('/:shopId/unlike', async (req, res) => {
     const { shopId } = req.body
     const { userId } = res.locals
     
@@ -144,22 +151,22 @@ router.post('/:shopId/unmark', async (req, res) => {
         const shop = await Shop.findById(shopId).exec()
         const user = await User.findById(userId).exec()
 
-        if (!shop.markedUser.indexOf(userId) === -1) {
-            shop.markedUser.remove(userId);
+        if (!shop.likes.indexOf(userId) === -1) {
+            shop.likes.remove(userId);
             shop.save();
         };
 
-        if (!user.markedShop.indexOf(shopId) === -1) {
-            user.markedShop.remove(shopId);
+        if (!user.likes.indexOf(shopId) === -1) {
+            user.likes.remove(shopId);
             user.save();
         };
 
-        res.status(200).json({ unmark: true })
+        res.status(200).json({ unlike: true })
 
     }catch(err){
         console.log(err)
         res.status(400).json({
-            unmark: false,
+            unlike: false,
             errorMessage: "가고싶다 등록 실패"
         })
     }
