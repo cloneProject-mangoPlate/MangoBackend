@@ -7,8 +7,6 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    // 유저아이디 가져오기
-    const { userId } = req.user;
     const mainlist = await Main.find({});
     console.log(mainlist);
     res.json({ mainlist });
@@ -46,7 +44,7 @@ router.get("/:keyword", async (req, res) => {
 
       // 점수 카테고리별 개수
       const rates = { highsRate: 0, middleRate: 0, lowsRate: 0 };
-      if (reviews) {
+      if (shop.reviews) {
         shop.reviews.forEach((e) => {
           if (e.rate === "맛있다") {
             rates.highsRate += 1;
