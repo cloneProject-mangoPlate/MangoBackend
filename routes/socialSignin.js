@@ -39,14 +39,14 @@ function authSuccess(req, res) {
             email,
           });
           req.user.userId = newuser.userId;
-          res.redirect("http://localhost:3000/signin=kakao");
+          res.redirect("http://localhost:3000");
         } else {
           req.user.userId = myuser.userId;
-          res.redirect("http://localhost:3000/signin=kakao");
+          res.redirect("http://localhost:3000");
         }
       } catch (error) {
         console.error(error);
-        res.status(401).redirect("http://localhost:3000/signin=kakao");
+        res.status(401).redirect("http://localhost:3000");
       }
     }
   );
@@ -55,8 +55,6 @@ function authSuccess(req, res) {
 // 클라이언트에서 세션 쿠키있으면 get 요청 후에
 // jwt 토큰 생성
 router.get("/user", (req, res) => {
-  console.log("리퀘스트테스트1", req.session);
-  console.log("리퀘스트테스트1", req.user);
   const { userId, profile, profileImg } = req.session.passport.user;
   const userInfo = { userId: userId, userName: profile.nickname };
   const options = {

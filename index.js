@@ -24,14 +24,14 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// app.use(
-//   session({
-//     secret: "SECRET_CODE",
-//     resave: true,
-//     saveUninitialized: false,
-//     cookie: { maxAge: 2400 * 60 * 60 },
-//   })
-// );
+app.use(
+  session({
+    secret: "SECRET_CODE",
+    resave: true,
+    saveUninitialized: false,
+    cookie: { maxAge: 2400 * 60 * 60 },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
