@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/:word', async(req, res) => {
     const searchWord = decodeURIComponent(req.params.word)
-    const { userId }= res.locals
+    // const { userId }= res.locals
 
   if (searchWord === "") {
     res.status(400).send({
@@ -17,19 +17,19 @@ router.get('/:word', async(req, res) => {
   }
 
     try{
-    const user = await User.findById(userId)
-    const words = user.recentSearch
+    // const user = await User.findById(userId)
+    // const words = user.recentSearch
     
-    if(words.indexOf(searchWord) === -1){
-        words.push(searchWord);
-        await user.save()
+    // if(words.indexOf(searchWord) === -1){
+    //     words.push(searchWord);
+    //     await user.save()
     
-    }else{
-        const wordIndex = words.indexOf(searchWord)
-        const slicedWord = words.slice(wordIndex, wordIndex)
-        words.push(slicedWord);
-        await user.save()
-    }
+    // }else{
+    //     const wordIndex = words.indexOf(searchWord)
+    //     const slicedWord = words.slice(wordIndex, wordIndex)
+    //     words.push(slicedWord);
+    //     await user.save()
+    // }
 
     const newSearch = new Search({ searchWord })
     await newSearch.save()

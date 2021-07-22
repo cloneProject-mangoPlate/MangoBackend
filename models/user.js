@@ -16,10 +16,6 @@ export const userSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  recentSearch: {
-    type: Array,
-    default: [],
-  },
 });
 
 userSchema.virtual("userId").get(function () {
