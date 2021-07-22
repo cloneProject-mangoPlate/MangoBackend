@@ -1,13 +1,16 @@
 # MangoPlate 클론코딩
 
-### Period 
+<li> 클론코딩 대상: www.mangoplate.com
+<li> 클론코딩 결과: 
+
+## 📆Period 
 2021.07.16 - 2021.07.22
 
 ## ⚙Node & npm Version
 node: v14.17.1  
 npm: 6.14.13  
 
-## 🤝Developers
+## 🤝 Developers
 
 - Backend   
   고수진 / social login, crawling  
