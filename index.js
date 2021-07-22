@@ -7,7 +7,14 @@ import "./models/index.js";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
+const corsOption = {
+  origin: process.env.CORS,
+  Credential: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

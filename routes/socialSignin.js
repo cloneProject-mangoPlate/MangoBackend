@@ -2,14 +2,13 @@ import express from "express";
 import passport from "passport";
 import request from "request";
 import jwt from "jsonwebtoken";
-import session from "express-session";
-import dotenv from "dotenv";
-dotenv.config();
-
+import dotenv from 'dotenv'
 // strategy import
+import session from "express-session"
 import Kakao from "passport-kakao";
 import User from "../models/user.js";
 
+dotenv.config()
 const router = express.Router();
 router.use(
   session({
