@@ -1,12 +1,14 @@
 import mongoose from 'mongoose'
 
 const connect = () => {
-	if (process.env.DEBUG !== 'conclusion') {
+	if (process.env.DEBUG !== 'false') {
 		mongoose.set('debug', true)
 	}
 }
 
 mongoose.connect('mongodb://localhost:27017/mango', {
+	// user: "test",
+	// pass: "test",
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 }, err => {

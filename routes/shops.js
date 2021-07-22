@@ -1,6 +1,9 @@
 import express from "express";
 import Shop from "../models/shop.js";
 import Main from "../models/main.js";
+import User from "../models/user.js"
+import auth from "../middlewares/auth-middleware.js";
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -21,7 +24,7 @@ router.get("/:keyword", async (req, res) => {
     console.log(keyword);
 
     const shops = await Shop.find({
-      keyword,
+      keyword
     });
     //   가봤어요 true false => 리뷰안에 유저아이디 / 샵아이디 있으면 true : false
     // 리뷰들 rated 카테고리별 개수 전달
@@ -53,7 +56,8 @@ router.get("/:keyword", async (req, res) => {
         rates: rates,
       };
       // shopOne.visited = userId ? visited : false;
-
+      shop.views++
+      await shop.save()
       console.log(shopOne);
       res.json({ shopOne });
     }
@@ -73,6 +77,67 @@ router.get("/:keyword", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).send("음식점 정보가 없습니다.");
+  }
+});
+
+
+//가고싶다(즐겨찾기)
+router.post('/:shopId/like', async(req,res) => {
+  const { shopId } = req.params
+  const { userId } = res.locals
+  
+  try{
+      const shop = await Shop.findById(shopId).exec()
+      const user = await User.findById(userId).exec()
+      
+      if (shop.likes.indexOf(userId) === -1) {
+      shop.likes.push(userId);
+      shop.save();
+      };
+      
+      if (user.likes.indexOf(shopId) === -1) {
+          user.likes.push(shopId);
+          user.save();
+      };
+
+      res.status(200).json({ like: true })
+
+  }catch(err){
+      console.log(err)
+      res.status(400).json({
+          like: false,
+          errorMessage: "가고싶다 등록 실패"
+      })
+  }
+});
+
+router.post('/:shopId/unlike', async (req, res) => {
+  const { shopId } = req.params
+  const { userId } = res.locals
+  
+  try{
+  
+      const shop = await Shop.findById(shopId).exec()
+      const user = await User.findById(userId).exec()
+
+      if (!shop.likes.indexOf(userId) === -1) {
+          shop.likes.remove(userId);
+          shop.save();
+      };
+
+      if (!user.likes.indexOf(shopId) === -1) {
+          user.likes.remove(shopId);
+          user.save();
+      };
+
+      res.status(200).json({ unlike: true })
+
+  }catch(err){
+      console.log(err)
+      res.status(400).json({
+          unlike: false,
+          errorMessage: "가고싶다 등록 실패"
+      })
   }
 });
 

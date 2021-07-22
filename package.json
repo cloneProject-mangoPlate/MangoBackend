@@ -14,6 +14,7 @@
   "author": "고수진 이경원",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.950.0",
     "bson-objectid": "^2.0.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

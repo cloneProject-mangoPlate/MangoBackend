@@ -10,7 +10,8 @@ let array = [];
 
 const main = async (crawlpage) => {
   const browser = await puppeteer.launch({
-    headless: false,
+    // headless: false,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   const crawlpage2 = crawlpage.split("/");
   const pageKeyword = crawlpage2[crawlpage2.length - 1];

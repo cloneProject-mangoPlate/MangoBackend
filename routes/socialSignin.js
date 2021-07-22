@@ -2,14 +2,13 @@ import express from "express";
 import passport from "passport";
 import request from "request";
 import jwt from "jsonwebtoken";
-import session from "express-session";
-import dotenv from "dotenv";
-dotenv.config();
-
+import dotenv from 'dotenv'
 // strategy import
+import session from "express-session"
 import Kakao from "passport-kakao";
 import User from "../models/user.js";
 
+dotenv.config()
 const router = express.Router();
 router.use(
   session({
@@ -19,10 +18,11 @@ router.use(
     cookie: { maxAge: 2400 * 60 * 60 },
   })
 );
-router.use(passport.initialize());
+
 const KakaoStrategy = Kakao.Strategy;
+router.use(passport.initialize());
 router.use(passport.session());
-// 카카오로그인
+// 카카오로그인;
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
@@ -65,9 +65,7 @@ function authSuccess(req, res) {
           userName: user,
           email,
         });
-        const myemail = await User.findOne({
-          email,
-        });
+
         // 이미 가입된 유저가 없으면 User 생성
         if (!myuser) {
           await User.create({
@@ -79,18 +77,14 @@ function authSuccess(req, res) {
             email,
           });
           req.user.userId = newuser.userId;
-          res.redirect("/api/social/user");
-        }
-        // 카카오 닉네임 갱신시 디비 유저 정보 업뎃
-        else if (!myuser && myemail) {
-          await User.updateOne({ email }, { $set: { userName: user } });
-          req.user.userId = myemail.userId;
-          res.redirect("/api/social/user");
-        }
-        // 이미 가입된 유저가 있다면
-        else {
+          req.session.user = req.user;
+          console.log("session정보", req.session);
+          res.redirect("/");
+        } else {
           req.user.userId = myuser.userId;
-          res.redirect("/api/social/user");
+          req.session.user = req.user;
+          console.log("session222", req.session);
+          res.redirect("/");
         }
       } catch (error) {
         console.error(error);
@@ -103,17 +97,24 @@ function authSuccess(req, res) {
 // 클라이언트에서 세션 쿠키있으면 get 요청 후에
 // jwt 토큰 생성
 router.get("/user", (req, res) => {
-  const { userId, profile, profileImg } = req.user;
+  const { userId, profile, profileImg } = req.session.passport.user;
   const userInfo = { userId: userId, userName: profile.nickname };
   const options = {
     expiresIn: "24h",
   };
-  console.log(req.user);
   const token = jwt.sign(userInfo, process.env.SECRET_KEY, options);
   res.send({ token, profileImg });
 });
 
 router.get("/kakao", passport.authenticate("kakao"));
 router.get("/kakao/callback", passport.authenticate("kakao"), authSuccess);
+
+// 로그아웃
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    req.logout();
+    res.redirect("/");
+  });
+});
 
 export default router;
