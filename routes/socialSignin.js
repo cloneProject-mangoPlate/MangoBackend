@@ -39,14 +39,14 @@ function authSuccess(req, res) {
             email,
           });
           req.user.userId = newuser.userId;
-          res.redirect("/");
+          res.redirect("http://localhost:3000/signin=kakao");
         } else {
           req.user.userId = myuser.userId;
-          res.redirect("/");
+          res.redirect("http://localhost:3000/signin=kakao");
         }
       } catch (error) {
         console.error(error);
-        res.status(401).redirect("/");
+        res.status(401).redirect("http://localhost:3000/signin=kakao");
       }
     }
   );
@@ -54,19 +54,32 @@ function authSuccess(req, res) {
 
 // 클라이언트에서 세션 쿠키있으면 get 요청 후에
 // jwt 토큰 생성
-// router.get("/user", (req, res) => {
-//   console.log("제발 찍혀라", req.session);
-//   const { userId, profile, profileImg } = req.session.passport.user;
-//   const userInfo = { userId: userId, userName: profile.nickname };
-//   const options = {
-//     expiresIn: "24h",
-//   };
-//   const token = jwt.sign(userInfo, process.env.SECRET_KEY, options);
-//   res.send({ token, profileImg });
-// });
+router.get("/user", (req, res) => {
+  console.log("리퀘스트테스트1", req.session);
+  console.log("리퀘스트테스트1", req.user);
+  const { userId, profile, profileImg } = req.session.passport.user;
+  const userInfo = { userId: userId, userName: profile.nickname };
+  const options = {
+    expiresIn: "24h",
+  };
+  const token = jwt.sign(userInfo, process.env.SECRET_KEY, options);
+  res.send({ token, profileImg });
+});
 
 router.get("/kakao", passport.authenticate("kakao"));
 router.get("/kakao/callback", passport.authenticate("kakao"), authSuccess);
+
+// router.get("/kakao/callback", (req, res, next) => {
+//   passport.authenticate(
+//     "kakao",
+//     { failureRedirect: "/" },
+//     (err, profile, token) => {
+//       if (err) return next(err);
+//       authSuccess;
+//       // res.redirect(`http://hanghaeeats.shop/token=${token}`);
+//     }
+//   )(req, res, next);
+// });
 
 // 로그아웃
 router.get("/logout", (req, res) => {
