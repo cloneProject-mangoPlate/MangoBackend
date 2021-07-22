@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
+    // 유저아이디 가져오기
+    const { userId } = req.user;
     const mainlist = await Main.find({});
     console.log(mainlist);
     res.json({ mainlist });
@@ -88,7 +90,7 @@ router.get("/:keyword", async (req, res) => {
 //가고싶다(즐겨찾기)
 router.post("/:shopId/like", async (req, res) => {
   const { shopId } = req.params;
-  const { userId } = res.locals;
+  const { userId } = req.user.userId;
 
   try {
     const shop = await Shop.findById(shopId).exec();
@@ -116,7 +118,7 @@ router.post("/:shopId/like", async (req, res) => {
 
 router.post("/:shopId/unlike", async (req, res) => {
   const { shopId } = req.params;
-  const { userId } = res.locals;
+  const { userId } = req.user.userId;
 
   try {
     const shop = await Shop.findById(shopId).exec();
