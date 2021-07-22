@@ -8,9 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     // 유저아이디 가져오기
-    const { userId } = req.user;
     const mainlist = await Main.find({});
-    console.log(mainlist);
     res.json({ mainlist });
   } catch (error) {
     console.error(error);

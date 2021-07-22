@@ -7,8 +7,6 @@ const connect = () => {
 }
 
 mongoose.connect('mongodb://localhost:27017/mango', {
-	// user: "test",
-	// pass: "test",
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 }, err => {
