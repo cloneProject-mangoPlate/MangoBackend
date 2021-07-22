@@ -1,13 +1,14 @@
 import express from "express";
 import Shop from "../models/shop.js";
 import Main from "../models/main.js";
-import User from "../models/user.js"
-import auth from "../middlewares/auth-middleware.js";
+import User from "../models/user.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
+    // 유저아이디 가져오기
+    const { userId } = req.user;
     const mainlist = await Main.find({});
     console.log(mainlist);
     res.json({ mainlist });
@@ -19,12 +20,13 @@ router.get("/", async (req, res) => {
 // 로그인 했으면 파람에 유저아이디 붙이기
 router.get("/:keyword", async (req, res) => {
   try {
-    // console.log("사용자", req);
+    // 유저아이디 가져오기
+    const userId = req.user ? req.user.userId : null;
     const { keyword } = req.params;
     console.log(keyword);
 
     const shops = await Shop.find({
-      keyword
+      keyword,
     });
     //   가봤어요 true false => 리뷰안에 유저아이디 / 샵아이디 있으면 true : false
     // 리뷰들 rated 카테고리별 개수 전달
@@ -34,30 +36,35 @@ router.get("/:keyword", async (req, res) => {
       const shop = await Shop.findById(keyword)
         .populate("reviews")
         .sort("-created_at");
-      // if (userId) {
-      //   // 유저 방문 여부 판단
-      //   const visits = shop.reviews.map((s) => s.userIds.join());
-      //   visited = visits.includes(userId) ? true : false;
-      // }
+      if (userId) {
+        // 유저 방문 여부 판단
+        if (shop.reviews) {
+          const visits = shop.reviews.map((s) => s.userIds.join());
+          visited = visits.includes(userId) ? true : false;
+        }
+      }
 
       // 점수 카테고리별 개수
       const rates = { highsRate: 0, middleRate: 0, lowsRate: 0 };
-      shop.reviews.forEach((e) => {
-        if (e.rate === "맛있다") {
-          rates.highsRate += 1;
-        } else if (e.rate === "괜찮다") {
-          rates.middleRate += 1;
-        } else if (e.rate === "별로") {
-          rates.lowsRate += 1;
-        }
-      });
+      if (reviews) {
+        shop.reviews.forEach((e) => {
+          if (e.rate === "맛있다") {
+            rates.highsRate += 1;
+          } else if (e.rate === "괜찮다") {
+            rates.middleRate += 1;
+          } else if (e.rate === "별로") {
+            rates.lowsRate += 1;
+          }
+        });
+      }
+
       const shopOne = {
         shop: shop,
         rates: rates,
       };
-      // shopOne.visited = userId ? visited : false;
-      shop.views++
-      await shop.save()
+      shopOne.visited = userId ? visited : false;
+      shop.views++;
+      await shop.save();
       console.log(shopOne);
       res.json({ shopOne });
     }
@@ -80,64 +87,60 @@ router.get("/:keyword", async (req, res) => {
   }
 });
 
-
 //가고싶다(즐겨찾기)
-router.post('/:shopId/like', async(req,res) => {
-  const { shopId } = req.params
-  const { userId } = res.locals
-  
-  try{
-      const shop = await Shop.findById(shopId).exec()
-      const user = await User.findById(userId).exec()
-      
-      if (shop.likes.indexOf(userId) === -1) {
+router.post("/:shopId/like", async (req, res) => {
+  const { shopId } = req.params;
+  const { userId } = res.locals;
+
+  try {
+    const shop = await Shop.findById(shopId).exec();
+    const user = await User.findById(userId).exec();
+
+    if (shop.likes.indexOf(userId) === -1) {
       shop.likes.push(userId);
       shop.save();
-      };
-      
-      if (user.likes.indexOf(shopId) === -1) {
-          user.likes.push(shopId);
-          user.save();
-      };
+    }
 
-      res.status(200).json({ like: true })
+    if (user.likes.indexOf(shopId) === -1) {
+      user.likes.push(shopId);
+      user.save();
+    }
 
-  }catch(err){
-      console.log(err)
-      res.status(400).json({
-          like: false,
-          errorMessage: "가고싶다 등록 실패"
-      })
+    res.status(200).json({ like: true });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      like: false,
+      errorMessage: "가고싶다 등록 실패",
+    });
   }
 });
 
-router.post('/:shopId/unlike', async (req, res) => {
-  const { shopId } = req.params
-  const { userId } = res.locals
-  
-  try{
-  
-      const shop = await Shop.findById(shopId).exec()
-      const user = await User.findById(userId).exec()
+router.post("/:shopId/unlike", async (req, res) => {
+  const { shopId } = req.params;
+  const { userId } = res.locals;
 
-      if (!shop.likes.indexOf(userId) === -1) {
-          shop.likes.remove(userId);
-          shop.save();
-      };
+  try {
+    const shop = await Shop.findById(shopId).exec();
+    const user = await User.findById(userId).exec();
 
-      if (!user.likes.indexOf(shopId) === -1) {
-          user.likes.remove(shopId);
-          user.save();
-      };
+    if (!shop.likes.indexOf(userId) === -1) {
+      shop.likes.remove(userId);
+      shop.save();
+    }
 
-      res.status(200).json({ unlike: true })
+    if (!user.likes.indexOf(shopId) === -1) {
+      user.likes.remove(shopId);
+      user.save();
+    }
 
-  }catch(err){
-      console.log(err)
-      res.status(400).json({
-          unlike: false,
-          errorMessage: "가고싶다 등록 실패"
-      })
+    res.status(200).json({ unlike: true });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      unlike: false,
+      errorMessage: "가고싶다 등록 실패",
+    });
   }
 });
 
