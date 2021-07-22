@@ -24,7 +24,7 @@ router.get("/:keyword", async (req, res) => {
     console.log(keyword);
 
     const shops = await Shop.find({
-      keyword,
+      keyword
     });
     //   가봤어요 true false => 리뷰안에 유저아이디 / 샵아이디 있으면 true : false
     // 리뷰들 rated 카테고리별 개수 전달
@@ -56,7 +56,8 @@ router.get("/:keyword", async (req, res) => {
         rates: rates,
       };
       // shopOne.visited = userId ? visited : false;
-
+      shop.views++
+      await shop.save()
       console.log(shopOne);
       res.json({ shopOne });
     }
@@ -81,7 +82,7 @@ router.get("/:keyword", async (req, res) => {
 
 
 //가고싶다(즐겨찾기)
-router.post('/:shopId/like',auth, async(req,res) => {
+router.post('/:shopId/like', async(req,res) => {
   const { shopId } = req.params
   const { userId } = res.locals
   
@@ -110,7 +111,7 @@ router.post('/:shopId/like',auth, async(req,res) => {
   }
 });
 
-router.post('/:shopId/unlike',auth, async (req, res) => {
+router.post('/:shopId/unlike', async (req, res) => {
   const { shopId } = req.params
   const { userId } = res.locals
   

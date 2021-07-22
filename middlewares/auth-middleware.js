@@ -2,12 +2,18 @@ import User from "../models/user.js";
 
 export default (req, res, next) => {
   const { authorization } = req.headers;
+
+  if (!authorization){
+    res.status(401).send({
+      errorMessage: "token이 없습니다"
+    })
+    return;
+  }
+
   const [tokenType, tokenValue] = authorization.split(" ");
 
   if (tokenType !== "Bearer") {
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요",
-    });
+    res.sendStatus(401)
     return;
   }
 
