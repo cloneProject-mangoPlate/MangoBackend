@@ -2,7 +2,7 @@ import express from "express";
 import Review from "../models/review.js";
 import Shop from "../models/shop.js";
 import ObjectID from "bson-objectid";
-// import { upload, S3 } from "../middlewares/imgUpload.js";
+import { upload, S3 } from "../middlewares/imgUpload.js";
 const router = express.Router();
 
 //리뷰 작성하기
