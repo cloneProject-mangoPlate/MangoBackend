@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/:shopId', upload.array('image'), async(req, res) => {
     const { shopId } = req.params;
     const { profilePic, text, rate } = req.body;
-    const { userId } = res.locals
+    const { userId } = req.user.userId
     if (text === '') {
         res.status(400).send({
           errorMessage: '내용을 작성해주세요.',
