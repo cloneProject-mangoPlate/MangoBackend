@@ -39,14 +39,14 @@ function authSuccess(req, res) {
             email,
           });
           req.user.userId = newuser.userId;
-          res.redirect("http://localhost:3000");
+          res.redirect("http://localhost:3000/auth");
         } else {
           req.user.userId = myuser.userId;
-          res.redirect("http://localhost:3000");
+          res.redirect("http://localhost:3000/auth");
         }
       } catch (error) {
         console.error(error);
-        res.status(401).redirect("http://localhost:3000");
+        res.status(401).redirect("http://localhost:3000/auth");
       }
     }
   );
@@ -55,13 +55,20 @@ function authSuccess(req, res) {
 // 클라이언트에서 세션 쿠키있으면 get 요청 후에
 // jwt 토큰 생성
 router.get("/user", (req, res) => {
-  const { userId, profile, profileImg } = req.session.passport.user;
-  const userInfo = { userId: userId, userName: profile.nickname };
-  const options = {
-    expiresIn: "24h",
-  };
-  const token = jwt.sign(userInfo, process.env.SECRET_KEY, options);
-  res.send({ token, profileImg });
+  try {
+    const { userId, profile, profileImg } = req.session.passport.user;
+    console.log("리퀘스트테스트1", req.session);
+    console.log("리퀘스트테스트1", req.user);
+    const userInfo = {
+      userId: userId,
+      userName: profile.nickname,
+      profileImg: profileImg,
+    };
+    res.send({ userInfo });
+  } catch (error) {
+    console.error(error);
+    res.status(401).send("로그인 인증 실패");
+  }
 });
 
 router.get("/kakao", passport.authenticate("kakao"));
